@@ -2,15 +2,28 @@
 
 import { useState } from 'react';
 import UploadForm from './UploadForm';
-import { savePoster } from '@/lib/db';
+import { checkFestivalExists, savePoster } from '@/lib/db';
 
 export default function UploadClient() {
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [artistList, setArtistList] = useState<string[] | string | null>(null);
+  const [festivalName, setFestivalName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleUploaded = async (url: string) => {
+    
+    if (!festivalName.trim()){
+      setError('Please enter a festival name.')
+      return;
+    }
+
+    const exists = await checkFestivalExists(festivalName.trim().toLowerCase());
+    if (exists) {
+      setError(`A festival named "${festivalName}" already exists.`)
+      return;
+    }
+
     setUploadedUrl(url);
     setLoading(true);
     setError(null);
@@ -37,6 +50,7 @@ export default function UploadClient() {
       await savePoster({
         imageUrl: url,
         artists: parsed,
+        festivalName,
       });
 
     } catch (err) {
@@ -49,10 +63,16 @@ export default function UploadClient() {
     
   };
 
-  
-
   return (
     <div className="space-y-6">
+
+      <input
+        type="text"
+        value={festivalName}
+        onChange={(e) => setFestivalName(e.target.value)}
+        placeholder="Enter festival name"
+        className="w-full border rounded p-2"
+      />
       <UploadForm onUploadComplete={handleUploaded} />
 
       {uploadedUrl && (

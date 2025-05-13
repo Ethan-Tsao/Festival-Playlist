@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: 'text',
-                text: `This is a music festival lineup poster. 
-                Extract the artist names.
-                Ignore sponsors, dates, locations, or logos — only return artist names.`,
+                text: `This is a music festival lineup poster. Extract only the artist names. Return a pure JSON array of strings like: ["ILLENIUM", "SLANDER", "KAYZO"] Do not include any explanations, day groupings, or extra text — only return valid JSON.`,
               },
               {
                 type: 'image_url',

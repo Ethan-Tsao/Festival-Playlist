@@ -40,3 +40,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - Next.js
 - Tailwind CSS
 - OpenAI API (GPT-4o vision)
+- using next-auth for now

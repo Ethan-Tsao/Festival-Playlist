@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import UploadForm from './UploadForm';
+import { savePoster } from '@/lib/db';
 
 export default function UploadClient() {
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
@@ -23,24 +24,32 @@ export default function UploadClient() {
 
       const { result } = await res.json();
 
-      // Try to parse as a flat array of names
+      let parsed: string[];
       try {
-        const parsed = JSON.parse(result);
-        if (Array.isArray(parsed)) {
-          setArtistList(parsed);
-        } else {
-          setArtistList(result); // fallback to raw
-        }
+        const parsedResult = JSON.parse(result);
+        parsed = Array.isArray(parsedResult) ? parsedResult : [parsedResult];
+        setArtistList(parsedResult);
       } catch {
-        setArtistList(result); // fallback to raw
+        parsed = [result]; // fallback to raw string
+        setArtistList(result);
       }
+
+      await savePoster({
+        imageUrl: url,
+        artists: parsed,
+      });
+
     } catch (err) {
       setError('Failed to extract artist names.');
       console.error(err);
     } finally {
       setLoading(false);
     }
+
+    
   };
+
+  
 
   return (
     <div className="space-y-6">

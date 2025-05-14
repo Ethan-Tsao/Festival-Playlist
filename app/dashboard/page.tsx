@@ -15,10 +15,9 @@ export default async function DashboardPage() {
 
   return (
     <AuthLayout>
-        <main className="p-6 max-w-xl mx-auto">
-                <h1 className="text-2xl font-bold mb-4">Upload Festival Lineup Poster</h1>
-                <UploadClient />
-              </main>
+        <main className="p-6 mx-auto">
+            <UploadClient />
+        </main>
     </AuthLayout>
   );
 }

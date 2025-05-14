@@ -15,9 +15,16 @@ export default async function Home() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Browse Festival Posters</h1>
-      <FestivalViewer posters={posters} />
-    </div>
+    <AuthLayout>
+      <>
+        <div className="max-w-2xl mx-auto p-6">
+          <h1 className="text-2xl font-bold text-center">Browse Festival Posters</h1>
+        </div>
+        
+        <div className="mx-auto p-6">
+          <FestivalViewer posters={posters} />
+        </div>
+      </>
+    </AuthLayout>
   );
 }

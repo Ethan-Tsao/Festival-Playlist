@@ -7,10 +7,14 @@ import { supabase } from '@/lib/supabase';
 export default function UploadClient() {
   const [festivalName, setFestivalName] = useState('');
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-  const [artistList, setArtistList] = useState<string[] | string | null>(null);
+  const [artistList, setArtistList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [poster, setPoster] = useState(false);
 
+
+  // upload to supabase and load the poster image
   const handleFileUpload = async (file: File) => {
     const filePath = `${Date.now()}-${file.name}`;
     const { data, error: uploadError } = await supabase.storage
@@ -29,26 +33,49 @@ export default function UploadClient() {
     setUploadedUrl(publicUrlData.publicUrl);
   };
 
-  const handleSubmit = async () => {
+  const handleSavePoster = async () => {
+    // if you try to submit without a festival name
     if (!festivalName.trim()) {
       setError('Please enter a festival name.');
       return;
     }
 
+    // if you try to submit without uploading an image
     if (!uploadedUrl) {
       setError('Please upload a poster image first.');
       return;
     }
 
+    // checks for duplicate festivals
     const exists = await checkFestivalExists(festivalName.trim().toLowerCase());
     if (exists) {
       setError(`A festival named "${festivalName}" already exists.`);
       return;
     }
 
+    try {
+      await savePoster({
+        imageUrl: uploadedUrl!,
+        artists: artistList,
+        festivalName,
+      });
+      setError(null);
+      setSuccess('Poster and artist list saves successfully!')
+    } catch (err) {
+      setError('Failed to save poster.');
+      console.error(err);
+    }
+  };
+
+
+  const handleSubmit = async () => {
+
+
+
     setLoading(true);
     setError(null);
 
+    // OpenAI api call
     try {
       const res = await fetch('/api/ocr', {
         method: 'POST',
@@ -56,38 +83,25 @@ export default function UploadClient() {
         body: JSON.stringify({ imageUrl: uploadedUrl }),
       });
 
-    const { result } = await res.json();
+      const { result } = await res.json();
 
-    let parsed: string[];
+      console.log(result)
 
-    try {
-      let cleaned = result.trim();
-      if (cleaned.startsWith('```json')) {
-        cleaned = cleaned.replace(/^```json/, '').replace(/```$/, '').trim();
-      } else if (cleaned.startsWith('```')) {
-        cleaned = cleaned.replace(/^```/, '').replace(/```$/, '').trim();
+      let parsedResult = JSON.parse(result);
+
+      try {
+        parsedResult = Array.isArray(parsedResult)
+          ? parsedResult.map((name: string) => name.replace(/^"(.*)"$/, '$1').trim())
+          : [String(parsedResult).replace(/^"(.*)"$/, '$1').trim()];
+
+        setArtistList(parsedResult);
+      } catch {
+        parsedResult = [result];
+        setArtistList(result);
       }
 
-      const parsedResult = JSON.parse(cleaned);
 
-      parsed = Array.isArray(parsedResult)
-        ? parsedResult.map((name: string) =>
-            name.replace(/^"(.*)"$/, '$1').trim()
-          )
-        : [String(parsedResult).replace(/^"(.*)"$/, '$1').trim()];
-
-      setArtistList(parsed);
-    } catch {
-      parsed = [result];
-      setArtistList(result);
-    }
-
-
-      await savePoster({
-        imageUrl: uploadedUrl,
-        artists: parsed,
-        festivalName,
-      });
+    console.log(parsedResult)
 
     } catch (err) {
       setError('Failed to extract artist names.');
@@ -101,7 +115,6 @@ export default function UploadClient() {
     <div>
       <div className="max-w-2xl mx-auto space-y-6">
         <h1 className="text-2xl font-bold">Upload a Festival Poster</h1>
-        <p className="text-gray-600">Give your festival a name and upload the lineup image. Click submit to extract artist names.</p>
 
         <div className="space-y-4">
           <label className="block font-medium">
@@ -117,9 +130,9 @@ export default function UploadClient() {
 
           <label
             htmlFor="poster-upload"
-            className="block w-full cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition rounded p-6 text-center text-sm text-gray-600"
+            className="block w-full cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition rounded p-6 text-center text-sm text-gray-100"
           >
-            Click to browse or drag & drop a poster image
+            {poster ? 'Poster Loaded' : 'Click to browse'}
             <input
               id="poster-upload"
               type="file"
@@ -127,6 +140,7 @@ export default function UploadClient() {
               className="hidden"
               onChange={(e) => {
                 if (e.target.files?.[0]) {
+                  setPoster(true);
                   handleFileUpload(e.target.files[0]);
                 }
               }}
@@ -143,6 +157,13 @@ export default function UploadClient() {
           </button>
         </div>
 
+        {success && (
+          <div className="mt-4 bg-green-100 text-green-800 px-4 py-2 rounded">
+            {success}
+          </div>
+        )}
+
+
         {uploadedUrl && !artistList && (
           <img src={uploadedUrl} alt="Uploaded poster" className="w-full rounded shadow" />
         )}
@@ -154,7 +175,43 @@ export default function UploadClient() {
         )}
       </div>
 
-      <div>
+      {uploadedUrl && artistList.length > 0 && (
+        <div className="mt-10 flex flex-col md:flex-row gap-6 mx-auto">
+          <div className="w-full md:w-1/2">
+            <img
+              src={uploadedUrl}
+              alt="Uploaded poster"
+              className="w-full rounded shadow object-contain"
+            />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Review and Edit Artists</h2>
+            <textarea
+              value={artistList.join('\n')}
+              onChange={(e) =>
+                setArtistList(
+                  e.target.value
+                    .split('\n')
+                    .map((line) => line.trim())
+                    .filter(Boolean)
+                )
+              }
+              className="w-full h-128 border rounded p-2 text-sm font-mono"
+            />
+
+            <button
+              onClick={handleSavePoster}
+              disabled={loading}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold"
+            >
+              Save to Database
+            </button>
+          </div>
+        </div>
+      )}
+
+
+      {/* <div>
         {uploadedUrl && artistList && (
           <div className="mt-10">
             <div className="flex flex-col md:flex-row gap-6 mx-auto">
@@ -183,7 +240,7 @@ export default function UploadClient() {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

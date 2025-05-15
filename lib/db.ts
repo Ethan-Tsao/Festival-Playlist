@@ -22,3 +22,4 @@ export async function checkFestivalExists(festivalName: string) {
     if (error) throw error;
     return data.length > 0
 }
+

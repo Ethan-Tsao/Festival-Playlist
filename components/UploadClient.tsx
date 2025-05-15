@@ -130,7 +130,7 @@ export default function UploadClient() {
 
           <label
             htmlFor="poster-upload"
-            className="block w-full cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition rounded p-6 text-center text-sm text-gray-100"
+            className="block w-full cursor-pointer border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition rounded p-6 text-center text-lg text-gray-100"
           >
             {poster ? 'Poster Loaded' : 'Click to browse'}
             <input
@@ -151,7 +151,7 @@ export default function UploadClient() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold transition disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-semibold transition transform disabled:opacity-50 text-lg cursor-pointer active:translate-y-[2px] active:shadow-inner "
           >
             {loading ? 'Extracting Artists...' : 'Submit'}
           </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 type Poster = {
@@ -11,8 +11,14 @@ type Poster = {
   created_at: string;
 };
 
+type Playlist = {
+  id: string; 
+  name: string ;
+};
+
 export default function FestivalViewer({ posters }: { posters: Poster[] }) {
   const [selectedId, setSelectedId] = useState<string>('');
+
 
   useEffect(() => {
     if (posters.length > 0 && !selectedId) {

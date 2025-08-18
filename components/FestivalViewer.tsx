@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 type Poster = {
   id: string;
@@ -39,14 +40,16 @@ export default function FestivalViewer({ posters }: { posters: Poster[] }) {
         {selected && (
           <div className="mt-10">
             <div className="flex flex-col md:flex-row gap-6 mx-auto">
-              <div className="w-full md:w-1/2">
-                <img
+              <div className="relative w-full" style={{ aspectRatio: '3 / 4' }}>
+                <Image
                   src={selected.image_url}
                   alt={selected.festival_name}
-                  className="w-full rounded shadow object-contain"
+                  fill
+                  priority={selected.id === posters[0]?.id}
+                  className="rounded shadow object-contain"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
-
               <div className="w-full md:w-1/2 overflow-auto">
                 <h2 className="text-lg font-semibold mb-2">Artists</h2>
                 {Array.isArray(selected.artists) ? (
@@ -56,9 +59,9 @@ export default function FestivalViewer({ posters }: { posters: Poster[] }) {
                     ))}
                   </div>
                 ) : (
-                  <pre className="p-2 rounded text-sm whitespace-pre-wrap">
+                  <div className="p-2 rounded text-sm whitespace-pre-wrap">
                     {selected.artists}
-                  </pre>
+                  </div>
                 )}
               </div>
             </div>

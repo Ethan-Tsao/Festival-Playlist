@@ -12,7 +12,6 @@ export default function Navbar() {
         Festival Playlist
         </Link>
 
-        {/* add dashboard button in if my email is authenticated */}
         {session?.user?.email === 'ethanotsao@gmail.com' && (
             <Link href="/dashboard" className="hover:underline">
                 Dashboard

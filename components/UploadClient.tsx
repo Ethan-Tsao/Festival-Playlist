@@ -209,38 +209,6 @@ export default function UploadClient() {
           </div>
         </div>
       )}
-
-
-      {/* <div>
-        {uploadedUrl && artistList && (
-          <div className="mt-10">
-            <div className="flex flex-col md:flex-row gap-6 mx-auto">
-              <div className="w-full md:w-1/2">
-                <img
-                  src={uploadedUrl}
-                  alt="Uploaded poster"
-                  className="w-full rounded shadow object-contain"
-                />
-              </div>
-
-              <div className="w-full md:w-1/2 overflow-auto">
-                <h2 className="text-lg font-semibold mb-2">Artists</h2>
-                {Array.isArray(artistList) ? (
-                  <div className="text-sm leading-relaxed grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2 list-disc list-inside">
-                    {artistList.map((artist, i) => (
-                      <span key={i} className="whitespace-nowrap">{artist}</span>
-                    ))}
-                  </div>
-                ) : (
-                  <pre className="p-2 rounded text-sm whitespace-pre-wrap">
-                    {artistList}
-                  </pre>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div> */}
     </div>
   );
 }

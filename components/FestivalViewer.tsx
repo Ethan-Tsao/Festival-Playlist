@@ -27,7 +27,7 @@ export default function FestivalViewer({ posters }: { posters: Poster[] }) {
       <select
         value={selectedId}
         onChange={(e) => setSelectedId(e.target.value)}
-        className="bg-black w-full p-2 border rounded"
+        className="bg-black w-1/2 p-2 border rounded"
       >
         {posters.map((poster) => (
           <option key={poster.id} value={poster.id}>

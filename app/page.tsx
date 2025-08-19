@@ -3,7 +3,7 @@ import AuthLayout from '@/components/AuthLayout';
 import { supabase } from '@/lib/supabase';
 import FestivalViewer from '@/components/FestivalViewer';
 import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import PlaylistArtistsButton from '@/components/PlaylistArtistsButton';
 
 export default async function Home() {

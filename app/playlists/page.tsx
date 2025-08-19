@@ -1,7 +1,6 @@
 // app/playlists/page.tsx
 import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
-
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default async function PlaylistsPage() {
   const session = await getServerSession(authOptions);
@@ -26,7 +25,7 @@ export default async function PlaylistsPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Your Spotify Playlists</h1>
-      <select className="bg-black w-half p-2 border rounded">
+      <select className="bg-black w- p-2 border rounded">
         {playlists.map((pl: any) => (
           <option key={pl.id} className="pb-1">
             {pl.name}

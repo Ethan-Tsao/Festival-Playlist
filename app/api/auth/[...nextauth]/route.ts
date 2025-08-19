@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth';
+import type { NextRequest } from 'next/server';
 import GoogleProvider from 'next-auth/providers/google';
 import SpotifyProvider from 'next-auth/providers/spotify';
 import { NextAuthOptions } from 'next-auth';
@@ -21,7 +22,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // Persist the OAuth tokens in the JWT
+    // persist the OAuth tokens in the JWT
     async jwt({ token, account }) {
       if (account?.provider === 'spotify') {
         token.spotifyAccessToken = account.access_token;
@@ -30,7 +31,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    // Make tokens available in the session object
+    // make tokens available in the session object
     async session({ session, token }) {
       session.user = session.user || {};
       if (token.spotifyAccessToken) {
@@ -46,6 +47,19 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
+export async function GET(
+  req: NextRequest,
+  ctx: { params: Promise<Record<string, string>> }
+) {
+  await ctx.params; // not used, but must be awaited to satisfy types
+  return handler(req);
+}
+export async function POST(
+  req: NextRequest,
+  ctx: { params: Promise<Record<string, string>> }
+) {
+  await ctx.params;
+  return handler(req);
+}
+
 const handler = NextAuth(authOptions);
-export const GET = handler;
-export const POST = handler;

@@ -8,7 +8,6 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   console.log(session?.user?.email)
 
-  // Restrict access to only your GitHub or Google email
   if (!session || session.user?.email !== 'ethanotsao@gmail.com') {
     redirect('/');
   }

@@ -1,5 +1,4 @@
 import NextAuth from 'next-auth';
-import type { NextRequest } from 'next/server';
 import GoogleProvider from 'next-auth/providers/google';
 import SpotifyProvider from 'next-auth/providers/spotify';
 import { NextAuthOptions } from 'next-auth';
@@ -47,19 +46,6 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-export async function GET(
-  req: NextRequest,
-  ctx: { params: Promise<Record<string, string>> }
-) {
-  await ctx.params; // not used, but must be awaited to satisfy types
-  return handler(req);
-}
-export async function POST(
-  req: NextRequest,
-  ctx: { params: Promise<Record<string, string>> }
-) {
-  await ctx.params;
-  return handler(req);
-}
-
 const handler = NextAuth(authOptions);
+export const GET = handler;
+export const POST = handler;

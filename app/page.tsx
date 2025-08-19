@@ -3,7 +3,7 @@ import AuthLayout from '@/components/AuthLayout';
 import { supabase } from '@/lib/supabase';
 import FestivalViewer from '@/components/FestivalViewer';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import PlaylistArtistsButton from '@/components/PlaylistArtistsButton';
 
 export default async function Home() {
@@ -21,21 +21,21 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
   const accessToken = (session as any)?.spotify?.accessToken;
   
-    // if (!accessToken) {
-    //   return <div>Please sign in with Spotify</div>;
-    // }
+  // if (!accessToken) {
+  //   return <div>Please sign in with Spotify</div>;
+  // }
+
+  const res = await fetch("https://api.spotify.com/v1/me/playlists?limit=50", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+
+  // if (!res.ok) {
+  //   return <div>Failed to load playlists</div>;
+  // }
   
-    const res = await fetch("https://api.spotify.com/v1/me/playlists?limit=50", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    });
-  
-    // if (!res.ok) {
-    //   return <div>Failed to load playlists</div>;
-    // }
-  
-    const data = await res.json();
-    const playlists = data.items || [];
+  const data = await res.json();
+  const playlists = data.items || [];
 
   return (
     <AuthLayout>

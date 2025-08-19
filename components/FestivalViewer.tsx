@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useArtistsStore } from '@/lib/useArtistsStore';
 
 type Poster = {
   id: string;
@@ -18,7 +19,9 @@ type Playlist = {
 
 export default function FestivalViewer({ posters }: { posters: Poster[] }) {
   const [selectedId, setSelectedId] = useState<string>('');
-
+  const setLineupArtists = useArtistsStore(s => s.setLineupArtists);
+  
+  const selected = posters.find((p) => p.id === selectedId);
 
   useEffect(() => {
     if (posters.length > 0 && !selectedId) {
@@ -26,7 +29,20 @@ export default function FestivalViewer({ posters }: { posters: Poster[] }) {
     }
   }, [posters, selectedId]);
 
-  const selected = posters.find((p) => p.id === selectedId);
+
+  useEffect(() => {
+    if (!selected) {
+      setLineupArtists([]);
+      return;
+    }
+    const lineup = Array.isArray(selected.artists)
+      ? selected.artists
+      : (selected.artists || '')
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean);
+    setLineupArtists(lineup);
+  }, [selected, setLineupArtists]);
 
   return (
     <div className="w-full px-6 max-w-screen-2xl mx-auto">
